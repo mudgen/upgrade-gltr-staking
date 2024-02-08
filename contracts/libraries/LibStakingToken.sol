@@ -3,6 +3,7 @@ pragma solidity 0.8.24;
 
 import {IERC721Receiver} from "../interfaces/IERC721Receiver.sol";
 import {IERC721, IERC721Errors} from "../interfaces/IERC721.sol";
+import {AAVEGOTCHI_DIAMOND, IERC721Marketplace} from "../interfaces/IERC721Marketplace.sol";
 
 struct TokenInfo {
   address owner;
@@ -80,5 +81,6 @@ library LibStakingToken {
     rt.ownerTokenIds[owner].pop();
     delete rt.tokenInfo[_tokenId];
     emit IERC721.Transfer(owner, address(0), _tokenId);
+    try IERC721Marketplace(AAVEGOTCHI_DIAMOND).updateERC721Listing(address(this), _tokenId, owner) {} catch {}    
   }
 }

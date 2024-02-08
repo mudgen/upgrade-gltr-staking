@@ -18,11 +18,13 @@ function getSelectors (contract) {
 
 const FacetCutAction = { Add: 0, Replace: 1, Remove: 2 }
 
-async function main() {
-  const stakingDiamondAddress = "0x1fE64677Ab1397e20A1211AFae2758570fEa1B8c" 
-  const diamondCutFacet = await hre.ethers.getContractAt("DiamondCutFacet", stakingDiamondAddress)
-
+async function deployUpgrade() {
   const ownerAddress = "0x01F010a5e001fe9d6940758EA5e8c777885E351e"
+  const signer = await hre.ethers.getImpersonatedSigner(ownerAddress)  
+  const stakingDiamondAddress = "0x1fE64677Ab1397e20A1211AFae2758570fEa1B8c" 
+  const diamondCutFacet = await hre.ethers.getContractAt("DiamondCutFacet", stakingDiamondAddress, signer)
+
+  
 
   // deploy facets
   console.log('')
@@ -42,28 +44,24 @@ async function main() {
       functionSelectors: getSelectors(facet)
     })
   }
-  console.log(cut)
-  const signer = await hre.ethers.getImpersonatedSigner(ownerAddress)  
+  //console.log(cut)
+  
   const tx = await diamondCutFacet.diamondCut(cut, hre.ethers.ZeroAddress, '0x', { gasLimit: 5000000})
   let receipt = await tx.wait()
   if (!receipt.status) {
     throw Error(`Diamond upgrade failed: ${tx.hash}`)
   }
-  console.log("complete")
-
-
-
-
-  
-
-
-  
-
+  console.log("Diamond upgrade complete")
+  return { stakingDiamondAddress }
 }
 
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+if (require.deployUpgrade === module) {
+  main().catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+  });
+}
+
+exports.deployUpgrade = deployUpgrade

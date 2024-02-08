@@ -83,7 +83,7 @@ contract StakingFacet is ReentrancyGuard {
       IERC20 lpToken = pool.lpToken;
       SafeERC20.safeTransferFrom(lpToken, address(this), owner, tokenStakedAmount);
       SafeERC20.safeTransferFrom(gltrToken, address(this), owner, gltrAmount);
-      LibStakingToken.burn(tokenId);
+      LibStakingToken.burn(tokenId);      
       emit BurnStakingToken(owner, tokenId, pid, address(lpToken), tokenStakedAmount, gltrAmount);
     }
   }

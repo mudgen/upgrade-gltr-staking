@@ -8,6 +8,7 @@ import {Strings} from "../libraries/Strings.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol"; 
 import {LibStakingToken, StakingTokenStorage} from "../libraries/LibStakingToken.sol";  
 import {LibDiamond} from "../diamond/libraries/LibDiamond.sol";
+import {AAVEGOTCHI_DIAMOND, IERC721Marketplace} from "../interfaces/IERC721Marketplace.sol";
 
 
 contract StakingTokenFacet is IERC721, IERC721Errors {
@@ -164,6 +165,9 @@ contract StakingTokenFacet is IERC721, IERC721Errors {
     st.tokenInfo[_tokenId].owner = _to;
     st.tokenInfo[_tokenId].ownerTokenIdsIndex = st.ownerTokenIds[_to].length;
     st.ownerTokenIds[_to].push(_tokenId);
+
+    //Update baazaar listing    
+    try IERC721Marketplace(AAVEGOTCHI_DIAMOND).updateERC721Listing(address(this), _tokenId, _from) {} catch {}    
 
     emit Transfer(_from, _to, _tokenId);
   }
